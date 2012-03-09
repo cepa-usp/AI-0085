@@ -45,7 +45,7 @@ package
 		private var labelEq:Array = new Array(numEquations);
 		private var labelText:Array = new Array();
 		private var labelEx:Array = new Array();
-		private var offset:Number = 20;
+		private var offset:Number = 10;
 		private var aLabel:Label = new Label();// Certo ou Errado
 		
 		//RadioButton Vars
@@ -69,8 +69,8 @@ package
 		private var Graph:SimpleGraph;
 		private var xRange:Array = [-3.5, 3.5];
 		private var yRange:Array = [-3.5, 3.5];
-		private var GRAPH_WIDTH = 400;
-		private var GRAPH_HEIGHT = 360;
+		private var GRAPH_WIDTH = 420;
+		private var GRAPH_HEIGHT = 380;
 		
 		//SCORM VARIABLES
 		private var completed:Boolean;
@@ -191,7 +191,7 @@ package
 			btCheck.y = 230;
 			
 			btNew = new BotaoReiniciar();
-			btNew.x = btCheck.x + btCheck.width + 10;
+			btNew.x = btCheck.x + btCheck.width / 2 + 15 + btNew.width / 2;
 			btNew.y = 230;
 			
 			//aviso.visible = false;
@@ -202,9 +202,17 @@ package
 			geraEq();
 			corrEq();
 			
+			pontaY.x = Graph.x + GRAPH_WIDTH / 2 + 0.5;
+			pontaY.y = Graph.y;
+			
+			pontaX.x = Graph.x + GRAPH_WIDTH;
+			pontaX.y = Graph.y + GRAPH_HEIGHT / 2 + 0.5;
+			
 			addListeners();
 			
 			initLMSConnection();
+			
+			iniciaTutorial();
 		}
 		
 		private function addListeners():void 
@@ -241,16 +249,16 @@ package
 			var resetTT:ToolTip = new ToolTip(botoes.resetButton, "Reiniciar", 12, 0.8, 100, 0.6, 0.1);
 			var intTT:ToolTip = new ToolTip(botoes.tutorialBtn, "Reiniciar tutorial", 12, 0.8, 150, 0.6, 0.1);
 			
-			var finalizaTT:ToolTip = new ToolTip(btCheck, "Finaliza atividade", 12, 0.8, 200, 0.6, 0.1);
-			var newTT:ToolTip = new ToolTip(btNew, "Reiniciar", 12, 0.8, 250, 0.6, 0.1);
+			//var finalizaTT:ToolTip = new ToolTip(btCheck, "Finalizar atividade", 12, 0.8, 200, 0.6, 0.1);
+			//var newTT:ToolTip = new ToolTip(btNew, "Reiniciar", 12, 0.8, 250, 0.6, 0.1);
 			
 			addChild(infoTT);
 			addChild(instTT);
 			addChild(resetTT);
 			addChild(intTT);
 			
-			addChild(finalizaTT);
-			addChild(newTT);
+			//addChild(finalizaTT);
+			//addChild(newTT);
 		}
 		
 		private function btChecka(event:MouseEvent):void {
@@ -341,6 +349,8 @@ package
 			}
 			geraEq();
 			corrEq();
+			setChildIndex(balao, numChildren - 1);
+			setChildIndex(bordaAtividade, numChildren - 1);
 		}
 		
 		//Função que gera equações
@@ -354,8 +364,8 @@ package
 			if (!comparaEq()) {
 				for (var j:uint = 1; j <= numEquations; j++) {
 				labelEq[j] = new RadioButton();
-				labelEq[j].x = 460;
-				labelEq[j].y = offset + 30*j;
+				labelEq[j].x = 450;
+				labelEq[j].y = 25 + 30*j;
 				labelEq[j].label = "";
 				labelEq[j].value = "y = "+ String(equation[j]).replace("*","");
 				labelEq[j].name = j;
@@ -364,8 +374,8 @@ package
 				labelEq[j].setStyle("textFormat", newFormat);
 				addChild(labelEq[j]);
 				labelText[j] = new TextField();
-				labelText[j].x = 30 + 460;
-				labelText[j].y = offset + 30 * j;
+				labelText[j].x = 30 + 450;
+				labelText[j].y = 25 + 30 * j;
 				if(randomB[j] < 0) labelText[j].text = "y = -("+String(randomA[j]).replace(".",",")+")";
 				else labelText[j].text = "y = ("+String(randomA[j]).replace(".",",")+")";
 				labelText[j].setTextFormat(newFormat);
@@ -374,7 +384,7 @@ package
 				addChild(labelText[j]);
 				labelEx[j] = new TextField();
 				labelEx[j].x = labelText[j].width + labelText[j].x;
-				labelEx[j].y = offset + 30*j - 5;
+				labelEx[j].y = 25 + 30*j - 5;
 				labelEx[j].text = String(randomK[j]).replace(".",",")+"x";
 				labelEx[j].setTextFormat(newFormat2);
 				labelEx[j].autoSize = "left";
@@ -420,17 +430,27 @@ package
 			randomTrue = rand(1,numEquations);
 			equation[randomTrue] = randomB[randomTrue] + "*(" + randomA[randomTrue] + "^(" + randomK[randomTrue] + "*x))";
 			// Gráfico
+			if (Graph != null) removeChild(Graph);
+			
 			Graph = new SimpleGraph(GRAPH_WIDTH, GRAPH_HEIGHT);
+			
 			Graph.x = offset;
 			Graph.y = offset;
 			Graph.board.setVarsRanges(xRange[0], xRange[1], yRange[0], yRange[1]);
 			Graph.board.drawAxes();
+			Graph.board.changeBorderColorAndThick(0xFFFFFF, 0);
+			Graph.board.changeBackAlpha(0);
+			//Graph.board.setCrossSizeAndThick(10, 10);
+			//Graph.board.setTicks(2, 2, 10, 10);
 			Graph.board.drawTicks();
-			Graph.board.drawGrid();
+			//Graph.board.drawGrid();
 			Graph.board.addLabels();
 			Graph.board.disableCoordsDisp();
 			Graph.graphRectangular(equation[randomTrue], "x", 1, 2, 0xCC0000);
 			addChild(Graph);
+			
+			setChildIndex(pontaX, numChildren - 1);
+			setChildIndex(pontaY, numChildren - 1);
 		}
 
 		//Função que limpa alternativas
@@ -456,60 +476,102 @@ package
 			contextMenu = menu;
 		}
 		
-		//------------------------- Tutorial -----------------------------//
 		
 		
+		//Tutorial
 		private var balao:CaixaTexto;
 		private var pointsTuto:Array;
+		private var pointsTuto2:Array;
 		private var tutoBaloonPos:Array;
+		private var tutoBaloonPos2:Array;
 		private var tutoPos:int;
-		private var tutoSequence:Array = ["Estas placas de Petri contém três espécies distintas de bactérias.", 
-										  "Classifique as bactérias arrastando os rótulos para as placas de Petri.",
-										  "O tubo de ensaio contém um líquido propício à proliferação das três bactérias.",
-										  "Esta escala indica a distribuição de oxigênio no tubo de ensaio: quanto mais verde, mais oxigênio há naquela altura do tubo.",
-										  "Você pode arrastar uma ou mais bactérias para dentro do tubo de ensaio.",
-										  "Pressione este botão para trocar o tubo de ensaio e começar uma nova experiência."];
+		private var tutoPhaseFinal:Boolean;
+		private var tutoSequence:Array = ["Este é o gráfico de uma função exponencial, escolhida aleatoriamente.",
+										  "Uma dessas alternativas contém a expressão da função cujo gráfico aparece ao lado. Identifique-a e, em seguida, pressione \"terminei\"."];
+										  
+		private var tutoSequence2:Array = ["A resposta correta foi destacada em verde.",
+										  "Você pode começar um novo exercício pressionando o botão \"Novo exercício\"."];
+										  
+		private var ptAltCerto:Point = new Point();
 		
 		private function iniciaTutorial(e:MouseEvent = null):void 
 		{
 			tutoPos = 0;
+			tutoPhaseFinal = false;
 			if(balao == null){
 				balao = new CaixaTexto(true);
 				addChild(balao);
 				balao.visible = false;
 				
-				pointsTuto = 	[new Point(),
-								new Point(),
-								new Point(),
-								new Point(),
-								new Point(),
-								new Point()];
+				pointsTuto = 	[new Point(Graph.x + GRAPH_WIDTH / 2, Graph.y + GRAPH_HEIGHT / 2),
+								new Point(455, 122)];
 								
-				tutoBaloonPos = [[CaixaTexto.BOTTON, CaixaTexto.CENTER],
-								[CaixaTexto.TOP, CaixaTexto.CENTER],
-								[CaixaTexto.LEFT, CaixaTexto.FIRST],
-								[CaixaTexto.LEFT, CaixaTexto.CENTER],
-								[CaixaTexto.BOTTON, CaixaTexto.CENTER],
-								[CaixaTexto.LEFT, CaixaTexto.LAST]];
+				tutoBaloonPos = [[CaixaTexto.TOP, CaixaTexto.CENTER],
+								[CaixaTexto.RIGHT, CaixaTexto.CENTER]];
+								
+				pointsTuto2 = 	[ptAltCerto,
+								new Point(btNew.x, btNew.y - btNew.height / 2)];
+								
+				tutoBaloonPos2 = 	[[CaixaTexto.RIGHT, CaixaTexto.CENTER],
+									[CaixaTexto.BOTTON, CaixaTexto.LAST]];
 			}
 			balao.removeEventListener(Event.CLOSE, closeBalao);
+			btCheck.removeEventListener(MouseEvent.CLICK, iniciaTutorialSegundaFase);
 			
 			balao.setText(tutoSequence[tutoPos], tutoBaloonPos[tutoPos][0], tutoBaloonPos[tutoPos][1]);
 			balao.setPosition(pointsTuto[tutoPos].x, pointsTuto[tutoPos].y);
 			balao.addEventListener(Event.CLOSE, closeBalao);
 			balao.visible = true;
+			setChildIndex(balao, numChildren - 1);
+			setChildIndex(bordaAtividade, numChildren - 1);
 		}
 		
 		private function closeBalao(e:Event):void 
 		{
-			tutoPos++;
-			if (tutoPos >= tutoSequence.length) {
+			ptAltCerto.x = labelEq[randomTrue].x;
+			ptAltCerto.y = labelEq[randomTrue].y + labelEq[randomTrue].height / 2;
+			
+			if (tutoPhaseFinal) {
+				tutoPos++;
+				if (tutoPos >= tutoSequence2.length) {
+					balao.removeEventListener(Event.CLOSE, closeBalao);
+					balao.visible = false;
+					btCheck.removeEventListener(MouseEvent.CLICK, iniciaTutorialSegundaFase);
+					tutoPhaseFinal = false;
+				}else {
+					btCheck.removeEventListener(MouseEvent.CLICK, iniciaTutorialSegundaFase);
+					balao.setText(tutoSequence2[tutoPos], tutoBaloonPos2[tutoPos][0], tutoBaloonPos2[tutoPos][1]);
+					balao.setPosition(pointsTuto2[tutoPos].x, pointsTuto2[tutoPos].y);
+					setChildIndex(balao, numChildren - 1);
+					setChildIndex(bordaAtividade, numChildren - 1);
+				}
+			}else{
+				tutoPos++;
+				if (tutoPos >= tutoSequence.length) {
+					balao.removeEventListener(Event.CLOSE, closeBalao);
+					balao.visible = false;
+					btCheck.addEventListener(MouseEvent.CLICK, iniciaTutorialSegundaFase);
+					tutoPhaseFinal = true;
+				}else {
+					balao.setText(tutoSequence[tutoPos], tutoBaloonPos[tutoPos][0], tutoBaloonPos[tutoPos][1]);
+					balao.setPosition(pointsTuto[tutoPos].x, pointsTuto[tutoPos].y);
+					setChildIndex(balao, numChildren - 1);
+					setChildIndex(bordaAtividade, numChildren - 1);
+				}
+			}
+		}
+		
+		private function iniciaTutorialSegundaFase(e:MouseEvent):void 
+		{
+			if (respUser == "") return;
+			if (tutoPhaseFinal) {
 				balao.removeEventListener(Event.CLOSE, closeBalao);
-				balao.visible = false;
-				//tutoPhase = false;
-			}else {
-				balao.setText(tutoSequence[tutoPos], tutoBaloonPos[tutoPos][0], tutoBaloonPos[tutoPos][1]);
-				balao.setPosition(pointsTuto[tutoPos].x, pointsTuto[tutoPos].y);
+				tutoPos = 0;
+				balao.setText(tutoSequence2[tutoPos], tutoBaloonPos2[tutoPos][0], tutoBaloonPos2[tutoPos][1]);
+				balao.setPosition(pointsTuto2[tutoPos].x, pointsTuto2[tutoPos].y);
+				balao.addEventListener(Event.CLOSE, closeBalao);
+				setChildIndex(balao, numChildren - 1);
+				setChildIndex(bordaAtividade, numChildren - 1);
 			}
 		}
 		
