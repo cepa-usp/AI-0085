@@ -504,7 +504,7 @@ package
 				balao.visible = false;
 				
 				pointsTuto = 	[new Point(Graph.x + GRAPH_WIDTH / 2, Graph.y + GRAPH_HEIGHT / 2),
-								new Point(455, 122)];
+								new Point(455, 127)];
 								
 				tutoBaloonPos = [[CaixaTexto.TOP, CaixaTexto.CENTER],
 								[CaixaTexto.RIGHT, CaixaTexto.CENTER]];
