@@ -393,9 +393,9 @@ package
 				}
 				rbGrp.addEventListener(MouseEvent.CLICK, clickHandler);
 				
-				btCheck.mouseEnabled = true;
-				btCheck.alpha = 1;
-				btCheck.filters = [];
+				btCheck.alpha = 0.5;
+				btCheck.filters = [GRAYSCALE_FILTER];
+				btCheck.mouseEnabled = false;
 				
 				btNew.mouseEnabled = false;
 				btNew.alpha = 0.5;
@@ -410,6 +410,10 @@ package
 		private function clickHandler(event:MouseEvent):void { 
 			respUser = event.target.selection.value;
 			indiceUser = event.target.selection.name;
+			
+			btCheck.mouseEnabled = true;
+			btCheck.alpha = 1;
+			btCheck.filters = [];
 		} 
 
 		//Função que verifica se existem eq iguais
@@ -489,8 +493,7 @@ package
 		private var tutoSequence:Array = ["Este é o gráfico de uma função exponencial, escolhida aleatoriamente.",
 										  "Uma dessas alternativas contém a expressão da função cujo gráfico aparece ao lado. Identifique-a e, em seguida, pressione \"terminei\"."];
 										  
-		private var tutoSequence2:Array = ["A resposta correta foi destacada em verde.",
-										  "Você pode começar um novo exercício pressionando o botão \"Novo exercício\"."];
+		private var tutoSequence2:Array = ["A resposta correta foi destacada em verde."];
 										  
 		private var ptAltCerto:Point = new Point();
 		
@@ -509,11 +512,9 @@ package
 				tutoBaloonPos = [[CaixaTexto.TOP, CaixaTexto.CENTER],
 								[CaixaTexto.RIGHT, CaixaTexto.CENTER]];
 								
-				pointsTuto2 = 	[ptAltCerto,
-								new Point(btNew.x, btNew.y - btNew.height / 2)];
+				pointsTuto2 = 	[ptAltCerto];
 								
-				tutoBaloonPos2 = 	[[CaixaTexto.RIGHT, CaixaTexto.CENTER],
-									[CaixaTexto.BOTTON, CaixaTexto.LAST]];
+				tutoBaloonPos2 = 	[[CaixaTexto.RIGHT, CaixaTexto.CENTER]];
 			}
 			balao.removeEventListener(Event.CLOSE, closeBalao);
 			btCheck.removeEventListener(MouseEvent.CLICK, iniciaTutorialSegundaFase);
