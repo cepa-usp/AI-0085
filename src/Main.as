@@ -361,6 +361,11 @@ package
 					}
 					//-----------------
 				}
+				
+				for (var j:uint = 1; j <= numEquations; j++) {
+					labelEq[j].mouseEnabled = false;
+				}
+				
 			}else
 			{	
 				
@@ -391,33 +396,33 @@ package
 			}
 			if (!comparaEq()) {
 				for (var j:uint = 1; j <= numEquations; j++) {
-				labelEq[j] = new RadioButton();
-				labelEq[j].x = 10;
-				labelEq[j].y = 3 + 25*j;
-				labelEq[j].label = "";
-				labelEq[j].value = "y = "+ String(equation[j]).replace("*","");
-				labelEq[j].name = j;
-				labelEq[j].group = rbGrp;
-				labelEq[j].width = 250;
-				labelEq[j].setStyle("textFormat", newFormat);
-				caixaOpcoes.addChild(labelEq[j]);
-				labelText[j] = new TextField();
-				labelText[j].x = 30 + 10;
-				labelText[j].y = 3 + 25 * j;
-				if(randomB[j] < 0) labelText[j].text = "y = -("+String(randomA[j]).replace(".",",")+")";
-				else labelText[j].text = "y = ("+String(randomA[j]).replace(".",",")+")";
-				labelText[j].setTextFormat(newFormat);
-				labelText[j].autoSize = "left";
-				labelText[j].selectable = false;
-				caixaOpcoes.addChild(labelText[j]);
-				labelEx[j] = new TextField();
-				labelEx[j].x = labelText[j].width + labelText[j].x;
-				labelEx[j].y = 3 + 25*j - 5;
-				labelEx[j].text = String(randomK[j]).replace(".",",")+"x";
-				labelEx[j].setTextFormat(newFormat2);
-				labelEx[j].autoSize = "left";
-				labelEx[j].selectable = false;
-				caixaOpcoes.addChild(labelEx[j]);
+					labelEq[j] = new RadioButton();
+					labelEq[j].x = 10;
+					labelEq[j].y = 3 + 25*j;
+					labelEq[j].label = "";
+					labelEq[j].value = "y = "+ String(equation[j]).replace("*","");
+					labelEq[j].name = j;
+					labelEq[j].group = rbGrp;
+					labelEq[j].width = 250;
+					labelEq[j].setStyle("textFormat", newFormat);
+					caixaOpcoes.addChild(labelEq[j]);
+					labelText[j] = new TextField();
+					labelText[j].x = 30 + 10;
+					labelText[j].y = 3 + 25 * j;
+					if(randomB[j] < 0) labelText[j].text = "y = -("+String(randomA[j]).replace(".",",")+")";
+					else labelText[j].text = "y = ("+String(randomA[j]).replace(".",",")+")";
+					labelText[j].setTextFormat(newFormat);
+					labelText[j].autoSize = "left";
+					labelText[j].selectable = false;
+					caixaOpcoes.addChild(labelText[j]);
+					labelEx[j] = new TextField();
+					labelEx[j].x = labelText[j].width + labelText[j].x;
+					labelEx[j].y = 3 + 25*j - 5;
+					labelEx[j].text = String(randomK[j]).replace(".",",")+"x";
+					labelEx[j].setTextFormat(newFormat2);
+					labelEx[j].autoSize = "left";
+					labelEx[j].selectable = false;
+					caixaOpcoes.addChild(labelEx[j]);
 				}
 				rbGrp.addEventListener(MouseEvent.CLICK, clickHandler);
 				
