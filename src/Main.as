@@ -7,6 +7,7 @@ package
 	import flash.display.MovieClip;
 	import flash.display.Stage;
 	import flash.events.MouseEvent;
+	import flash.external.ExternalInterface;
 	import flash.filters.ColorMatrixFilter;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -67,9 +68,9 @@ package
 		
 		//Graph Vars
 		private var Graph:SimpleGraph;
-		private var xRange:Array = [-3.5, 3.5];
-		private var yRange:Array = [-3.5, 3.5];
-		private var GRAPH_WIDTH = 420;
+		private var xRange:Array = [-8.5, 8.5];
+		private var yRange:Array = [-4.5, 4.5];
+		private var GRAPH_WIDTH = 680;
 		private var GRAPH_HEIGHT = 380;
 		
 		//SCORM VARIABLES
@@ -86,6 +87,7 @@ package
 		
 		private var orientacoesScreen:InstScreen;
 		private var creditosScreen:AboutScreen;
+		private var caixaOpcoes:MovieClip;
 		
 		/*
 		 * Filtro de conversão para tons de cinza.
@@ -185,19 +187,7 @@ package
 			addChild(orientacoesScreen);
 
 			initContextMenu ();
-			
-			btCheck = new BotaoTerminei();
-			btCheck.x = 450 + btCheck.width / 2;
-			btCheck.y = 230;
-			
-			btNew = new BotaoReiniciar();
-			btNew.x = btCheck.x + btCheck.width / 2 + 15 + btNew.width / 2;
-			btNew.y = 230;
-			
-			//aviso.visible = false;
-			
-			addChild(btCheck);
-			addChild(btNew);
+			createCaixaOpcoes();
 			
 			geraEq();
 			corrEq();
@@ -210,9 +200,46 @@ package
 			
 			addListeners();
 			
-			initLMSConnection();
-			
 			iniciaTutorial();
+			
+			if(ExternalInterface.available) initLMSConnection();
+		}
+		
+		private function createCaixaOpcoes():void 
+		{
+			caixaOpcoes = new CaixaOpcoes();
+			addChild(caixaOpcoes);
+			caixaOpcoes.x = 10;
+			caixaOpcoes.y = 10;
+			
+			btCheck = caixaOpcoes.btTerminei;
+			btNew = caixaOpcoes.btNovo;
+			
+			caixaOpcoes.addEventListener(MouseEvent.MOUSE_DOWN, initDrag);
+			
+			//btCheck = new BotaoTerminei();
+			//btCheck.x = 450 + btCheck.width / 2;
+			//btCheck.y = 230;
+			
+			//btNew = new BotaoReiniciar();
+			//btNew.x = btCheck.x + btCheck.width / 2 + 15 + btNew.width / 2;
+			//btNew.y = 230;
+			
+			//addChild(btCheck);
+			//addChild(btNew);
+		}
+		
+		private function initDrag(e:MouseEvent):void 
+		{
+			if (e.target is RadioButton || e.target is SimpleButton) return;
+			
+			stage.addEventListener(MouseEvent.MOUSE_UP, stopDragCaixa);
+			caixaOpcoes.startDrag();
+		}
+		
+		private function stopDragCaixa(e:MouseEvent):void 
+		{
+			caixaOpcoes.stopDrag();
 		}
 		
 		private function addListeners():void 
@@ -300,6 +327,7 @@ package
 				}
 				if(respUser != labelEq[randomTrue].value){
 					//labelEq[Number(indiceUser)].setStyle("textFormat", wrong);
+					//labelEq[Number(randomTrue)].setStyle("textFormat", correct);
 					labelText[indiceUser].setTextFormat(wrong);
 					labelEx[indiceUser].setTextFormat(wrong2);
 					labelEx[indiceUser].x = labelEx[indiceUser].x + 2;
@@ -333,6 +361,11 @@ package
 					}
 					//-----------------
 				}
+				
+				for (var j:uint = 1; j <= numEquations; j++) {
+					labelEq[j].mouseEnabled = false;
+				}
+				
 			}else
 			{	
 				
@@ -343,9 +376,9 @@ package
 			//removeChild(aLabel);
 			respUser = "";
 			for (var i:uint = 1; i <= numEquations; i++) {
-				removeChild(labelEq[i]);
-				removeChild(labelText[i]);
-				removeChild(labelEx[i]);
+				caixaOpcoes.removeChild(labelEq[i]);
+				caixaOpcoes.removeChild(labelText[i]);
+				caixaOpcoes.removeChild(labelEx[i]);
 			}
 			geraEq();
 			corrEq();
@@ -363,33 +396,33 @@ package
 			}
 			if (!comparaEq()) {
 				for (var j:uint = 1; j <= numEquations; j++) {
-				labelEq[j] = new RadioButton();
-				labelEq[j].x = 450;
-				labelEq[j].y = 25 + 30*j;
-				labelEq[j].label = "";
-				labelEq[j].value = "y = "+ String(equation[j]).replace("*","");
-				labelEq[j].name = j;
-				labelEq[j].group = rbGrp;
-				labelEq[j].width = 200;
-				labelEq[j].setStyle("textFormat", newFormat);
-				addChild(labelEq[j]);
-				labelText[j] = new TextField();
-				labelText[j].x = 30 + 450;
-				labelText[j].y = 25 + 30 * j;
-				if(randomB[j] < 0) labelText[j].text = "y = -("+String(randomA[j]).replace(".",",")+")";
-				else labelText[j].text = "y = ("+String(randomA[j]).replace(".",",")+")";
-				labelText[j].setTextFormat(newFormat);
-				labelText[j].autoSize = "left";
-				labelText[j].selectable = false;
-				addChild(labelText[j]);
-				labelEx[j] = new TextField();
-				labelEx[j].x = labelText[j].width + labelText[j].x;
-				labelEx[j].y = 25 + 30*j - 5;
-				labelEx[j].text = String(randomK[j]).replace(".",",")+"x";
-				labelEx[j].setTextFormat(newFormat2);
-				labelEx[j].autoSize = "left";
-				labelEx[j].selectable = false;
-				addChild(labelEx[j]);
+					labelEq[j] = new RadioButton();
+					labelEq[j].x = 10;
+					labelEq[j].y = 3 + 25*j;
+					labelEq[j].label = "";
+					labelEq[j].value = "y = "+ String(equation[j]).replace("*","");
+					labelEq[j].name = j;
+					labelEq[j].group = rbGrp;
+					labelEq[j].width = 250;
+					labelEq[j].setStyle("textFormat", newFormat);
+					caixaOpcoes.addChild(labelEq[j]);
+					labelText[j] = new TextField();
+					labelText[j].x = 30 + 10;
+					labelText[j].y = 3 + 25 * j;
+					if(randomB[j] < 0) labelText[j].text = "y = -("+String(randomA[j]).replace(".",",")+")";
+					else labelText[j].text = "y = ("+String(randomA[j]).replace(".",",")+")";
+					labelText[j].setTextFormat(newFormat);
+					labelText[j].autoSize = "left";
+					labelText[j].selectable = false;
+					caixaOpcoes.addChild(labelText[j]);
+					labelEx[j] = new TextField();
+					labelEx[j].x = labelText[j].width + labelText[j].x;
+					labelEx[j].y = 3 + 25*j - 5;
+					labelEx[j].text = String(randomK[j]).replace(".",",")+"x";
+					labelEx[j].setTextFormat(newFormat2);
+					labelEx[j].autoSize = "left";
+					labelEx[j].selectable = false;
+					caixaOpcoes.addChild(labelEx[j]);
 				}
 				rbGrp.addEventListener(MouseEvent.CLICK, clickHandler);
 				
@@ -450,11 +483,13 @@ package
 			//Graph.board.drawGrid();
 			Graph.board.addLabels();
 			Graph.board.disableCoordsDisp();
+			Graph.setNumPoints(20000);
 			Graph.graphRectangular(equation[randomTrue], "x", 1, 2, 0xCC0000);
 			addChild(Graph);
 			
-			setChildIndex(pontaX, numChildren - 1);
-			setChildIndex(pontaY, numChildren - 1);
+			setChildIndex(pontaX, 0);
+			setChildIndex(pontaY, 0);
+			setChildIndex(Graph, 0);
 		}
 
 		//Função que limpa alternativas
@@ -496,9 +531,12 @@ package
 		private var tutoSequence2:Array = ["A resposta correta foi destacada em verde."];
 										  
 		private var ptAltCerto:Point = new Point();
+		private var ptAltCaixaOpcoes:Point = new Point();
+		private var posCaixa:Array = ["",""];
 		
 		private function iniciaTutorial(e:MouseEvent = null):void 
 		{
+			getPosCaixa();
 			tutoPos = 0;
 			tutoPhaseFinal = false;
 			if(balao == null){
@@ -507,14 +545,14 @@ package
 				balao.visible = false;
 				
 				pointsTuto = 	[new Point(Graph.x + GRAPH_WIDTH / 2, Graph.y + GRAPH_HEIGHT / 2),
-								new Point(455, 127)];
+								ptAltCaixaOpcoes];
 								
 				tutoBaloonPos = [[CaixaTexto.TOP, CaixaTexto.CENTER],
-								[CaixaTexto.RIGHT, CaixaTexto.CENTER]];
+								posCaixa];
 								
 				pointsTuto2 = 	[ptAltCerto];
 								
-				tutoBaloonPos2 = 	[[CaixaTexto.RIGHT, CaixaTexto.CENTER]];
+				tutoBaloonPos2 = 	[posCaixa];
 			}
 			balao.removeEventListener(Event.CLOSE, closeBalao);
 			btCheck.removeEventListener(MouseEvent.CLICK, iniciaTutorialSegundaFase);
@@ -527,10 +565,36 @@ package
 			setChildIndex(bordaAtividade, numChildren - 1);
 		}
 		
+		private function getPosCaixa():void
+		{
+			if (caixaOpcoes.x + caixaOpcoes.width / 2 > 350) {
+				posCaixa[0] = CaixaTexto.RIGHT;
+				posCaixa[1] = CaixaTexto.CENTER;
+			}else {
+				posCaixa[0] = CaixaTexto.LEFT;
+				posCaixa[1] = CaixaTexto.CENTER;
+			}
+			
+			var ptAltCertoGlobal:Point = caixaOpcoes.localToGlobal(new Point(labelEq[randomTrue].x, labelEq[randomTrue].y));
+			
+			if (caixaOpcoes.x + caixaOpcoes.width / 2 > 350) {
+				ptAltCerto.x = caixaOpcoes.x + 20;
+				ptAltCerto.y = ptAltCertoGlobal.y + labelEq[randomTrue].height / 2;
+				
+				ptAltCaixaOpcoes.x = caixaOpcoes.x;
+				ptAltCaixaOpcoes.y = caixaOpcoes.y + caixaOpcoes.height / 2;
+			}else {
+				ptAltCerto.x = caixaOpcoes.x + caixaOpcoes.width - 80;
+				ptAltCerto.y = ptAltCertoGlobal.y + labelEq[randomTrue].height / 2;
+				
+				ptAltCaixaOpcoes.x = caixaOpcoes.x + caixaOpcoes.width;
+				ptAltCaixaOpcoes.y = caixaOpcoes.y + caixaOpcoes.height / 2;
+			}
+		}
+		
 		private function closeBalao(e:Event):void 
 		{
-			ptAltCerto.x = labelEq[randomTrue].x;
-			ptAltCerto.y = labelEq[randomTrue].y + labelEq[randomTrue].height / 2;
+			getPosCaixa();
 			
 			if (tutoPhaseFinal) {
 				tutoPos++;
@@ -541,8 +605,8 @@ package
 					tutoPhaseFinal = false;
 				}else {
 					btCheck.removeEventListener(MouseEvent.CLICK, iniciaTutorialSegundaFase);
-					balao.setText(tutoSequence2[tutoPos], tutoBaloonPos2[tutoPos][0], tutoBaloonPos2[tutoPos][1]);
-					balao.setPosition(pointsTuto2[tutoPos].x, pointsTuto2[tutoPos].y);
+					balao.setText(tutoSequence2[tutoPos], posCaixa[0], posCaixa[1]);
+					balao.setPosition(ptAltCerto.x, ptAltCerto.y);
 					setChildIndex(balao, numChildren - 1);
 					setChildIndex(bordaAtividade, numChildren - 1);
 				}
@@ -554,8 +618,15 @@ package
 					btCheck.addEventListener(MouseEvent.CLICK, iniciaTutorialSegundaFase);
 					tutoPhaseFinal = true;
 				}else {
-					balao.setText(tutoSequence[tutoPos], tutoBaloonPos[tutoPos][0], tutoBaloonPos[tutoPos][1]);
-					balao.setPosition(pointsTuto[tutoPos].x, pointsTuto[tutoPos].y);
+					if (tutoPos == 1) {
+						balao.setText(tutoSequence[tutoPos], posCaixa[0], posCaixa[1]);
+						balao.setPosition(ptAltCaixaOpcoes.x, ptAltCaixaOpcoes.y);
+					}
+					else {
+						balao.setText(tutoSequence[tutoPos], tutoBaloonPos[tutoPos][0], tutoBaloonPos[tutoPos][1]);
+						balao.setPosition(pointsTuto[tutoPos].x, pointsTuto[tutoPos].y);
+					}
+					
 					setChildIndex(balao, numChildren - 1);
 					setChildIndex(bordaAtividade, numChildren - 1);
 				}
@@ -565,11 +636,14 @@ package
 		private function iniciaTutorialSegundaFase(e:MouseEvent):void 
 		{
 			if (respUser == "") return;
+			
+			getPosCaixa();
+			
 			if (tutoPhaseFinal) {
 				balao.removeEventListener(Event.CLOSE, closeBalao);
 				tutoPos = 0;
-				balao.setText(tutoSequence2[tutoPos], tutoBaloonPos2[tutoPos][0], tutoBaloonPos2[tutoPos][1]);
-				balao.setPosition(pointsTuto2[tutoPos].x, pointsTuto2[tutoPos].y);
+				balao.setText(tutoSequence2[tutoPos], posCaixa[0], posCaixa[1]);
+				balao.setPosition(ptAltCerto.x, ptAltCerto.y);
 				balao.addEventListener(Event.CLOSE, closeBalao);
 				setChildIndex(balao, numChildren - 1);
 				setChildIndex(bordaAtividade, numChildren - 1);
